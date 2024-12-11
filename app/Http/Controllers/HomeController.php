@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\DeviceData;
 
 class HomeController extends Controller
 {
@@ -23,6 +24,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('pages.dashboard');
+        $data = DeviceData::select('battery','curah_hujan','tinggi_air','debit_air')->latest()->first();
+        return view('pages.dashboard', compact('data'));
     }
 }

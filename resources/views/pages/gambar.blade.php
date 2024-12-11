@@ -1,6 +1,6 @@
 @extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 @section('content')
-    @include('layouts.navbars.auth.topnav', ['title' => 'Riwayat Data Sensor'])
+    @include('layouts.navbars.auth.topnav', ['title' => 'Gambar'])
     <div class="container-fluid py-4">
         <form class="d-flex flex-row justify-content-end p-3 align-items-center card mb-3" action="#">
             <div class="d-flex flex-row me-3">

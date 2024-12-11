@@ -21,78 +21,58 @@
                 </div>
             </div>
             <div class="d-flex flex-column flex-md-row gap-3">
-                <div class="flex-grow-1 mb-xl-0 mb-4">
-                    <div class="card">
-                        <div class="card-body p-3">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <div class="numbers">
-                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">Today's Users</p>
-                                        <h5 class="font-weight-bolder">
-                                            2,300
-                                        </h5>
-                                        <p class="mb-0">
-                                            <span class="text-success text-sm font-weight-bolder">+3%</span>
-                                            since last week
-                                        </p>
-                                    </div>
+                <div class="card flex-grow-1">
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="numbers d-flex flex-column">
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Ketinggian Air</p>
+                                    <h5 class="font-weight-bolder fs-3 ">
+                                        {{ $data->tinggi_air }} cm
+                                    </h5>
                                 </div>
-                                <div class="text-end">
-                                    <div
-                                        class="icon icon-shape bg-gradient-danger shadow-danger text-center rounded-circle">
-                                        <i class="ni ni-world text-lg opacity-10" aria-hidden="true"></i>
-                                    </div>
+                            </div>
+                            <div class="col-4 text-end">
+                                <div class="icon icon-shape bg-gradient-danger shadow-danger text-center rounded-circle">
+                                    <i class="fa-solid fa-droplet opacity-10 fa-lg"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="flex-grow-1 mb-xl-0 mb-4">
-                    <div class="card">
-                        <div class="card-body p-3">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <div class="numbers">
-                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">New Clients</p>
-                                        <h5 class="font-weight-bolder">
-                                            +3,462
-                                        </h5>
-                                        <p class="mb-0">
-                                            <span class="text-danger text-sm font-weight-bolder">-2%</span>
-                                            since last quarter
-                                        </p>
-                                    </div>
+                <div class="card flex-grow-1">
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="numbers d-flex flex-column">
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Debit Air</p>
+                                    <h5 class="font-weight-bolder fs-3 ">
+                                        {{ $data->debit_air }} L/s
+                                    </h5>
                                 </div>
-                                <div class="text-end">
-                                    <div
-                                        class="icon icon-shape bg-gradient-success shadow-success text-center rounded-circle">
-                                        <i class="ni ni-paper-diploma text-lg opacity-10" aria-hidden="true"></i>
-                                    </div>
+                            </div>
+                            <div class="col-4 text-end">
+                                <div class="icon icon-shape bg-gradient-info shadow-info text-center rounded-circle">
+                                    <i class="fa-solid fa-water opacity-10 fa-lg"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="flex-grow-1">
-                    <div class="card">
-                        <div class="card-body p-3">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <div class="numbers">
-                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">Sales</p>
-                                        <h5 class="font-weight-bolder">
-                                            $103,430
-                                        </h5>
-                                        <p class="mb-0">
-                                            <span class="text-success text-sm font-weight-bolder">+5%</span> than last month
-                                        </p>
-                                    </div>
+                <div class="card flex-grow-1">
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="numbers d-flex flex-column">
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Curah Hujan</p>
+                                    <h5 class="font-weight-bolder fs-3 ">
+                                        {{ $data->curah_hujan }} mm
+                                    </h5>
                                 </div>
-                                <div class="text-end">
-                                    <div
-                                        class="icon icon-shape bg-gradient-warning shadow-warning text-center rounded-circle">
-                                        <i class="ni ni-cart text-lg opacity-10" aria-hidden="true"></i>
-                                    </div>
+                            </div>
+                            <div class="col-4 text-end">
+                                <div class="icon icon-shape bg-gradient-success shadow-success text-center rounded-circle">
+                                    <i class="fa-solid fa-cloud-showers-heavy opacity-10 fa-lg"></i>
                                 </div>
                             </div>
                         </div>
@@ -102,23 +82,21 @@
         </div>
         <div class="d-flex flex-column flex-md-row w-100 gap-3">
             <div style="width : 20rem" class="d-flex flex-column gap-3">
-                <div class="card flex-grow-1">
+                <div class="card flex-grow-0">
                     <div class="card-body p-3">
                         <div class="row">
                             <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Sales</p>
-                                    <h5 class="font-weight-bolder">
-                                        $103,430
+                                <div class="numbers d-flex flex-column">
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Battery</p>
+                                    <h5 class="font-weight-bolder fs-3 ">
+                                        {{ $data->battery }} %
                                     </h5>
-                                    <p class="mb-0">
-                                        <span class="text-success text-sm font-weight-bolder">+5%</span> than last month
-                                    </p>
                                 </div>
                             </div>
                             <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-warning shadow-warning text-center rounded-circle">
-                                    <i class="ni ni-cart text-lg opacity-10" aria-hidden="true"></i>
+                                <div
+                                    class="icon icon-shape bg-primary bg-gradient shadow-secondary text-center rounded-circle">
+                                    <i class="fa-solid fa-battery-three-quarters opacity-10 fa-lg"></i>
                                 </div>
                             </div>
                         </div>
