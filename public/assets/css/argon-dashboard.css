@@ -2940,10 +2940,10 @@ textarea.form-control-lg {
   border-color: transparent;
 }
 .form-check-input:checked[type=checkbox] {
-  background-image: linear-gradient(310deg, #4B5320 0%, #f56036 100%);
+  background-image: linear-gradient(310deg, #4B5320 0%, #82912f 100%);
 }
 .form-check-input:checked[type=radio] {
-  background-image: linear-gradient(310deg, #4B5320 0%, #f56036 100%);
+  background-image: linear-gradient(310deg, #4B5320 0%, #82912f 100%);
 }
 .form-check-input[type=checkbox]:indeterminate {
   background-color: #4B5320;
@@ -19692,7 +19692,7 @@ textarea.form-control-lg {
   background: rgba(0, 0, 0, 0.2);
 }
 .card.card-background.card-background-mask-primary:after {
-  background-image: linear-gradient(310deg, #4B5320 0%, #f56036 100%);
+  background-image: linear-gradient(310deg, #4B5320 0%, #82912f 100%);
   opacity: 0.85;
 }
 .card.card-background.card-background-mask-secondary:before {
@@ -19727,7 +19727,7 @@ textarea.form-control-lg {
   background: rgba(0, 0, 0, 0.2);
 }
 .card.card-background.card-background-mask-danger:after {
-  background-image: linear-gradient(310deg, #f5365c 0%, #f56036 100%);
+  background-image: linear-gradient(310deg, #f5365c 0%, #82912f 100%);
   opacity: 0.85;
 }
 .card.card-background.card-background-mask-light:before {
@@ -20345,7 +20345,7 @@ label,
 }
 
 .bg-gradient-primary {
-  background-image: linear-gradient(310deg, #4B5320 0%, #f56036 100%);
+  background-image: linear-gradient(310deg, #4B5320 0%, #82912f 100%);
 }
 
 .bg-gradient-secondary {
@@ -20365,7 +20365,7 @@ label,
 }
 
 .bg-gradient-danger {
-  background-image: linear-gradient(310deg, #f5365c 0%, #f56036 100%);
+  background-image: linear-gradient(310deg, #f5365c 0%, #82912f 100%);
 }
 
 .bg-gradient-light {
@@ -20555,7 +20555,7 @@ svg.text-primary .color-foreground {
   fill: #4B5320;
 }
 svg.text-primary .color-background {
-  fill: #f56036;
+  fill: #82912f;
 }
 
 svg.text-secondary .color-foreground {
@@ -20583,7 +20583,7 @@ svg.text-danger .color-foreground {
   fill: #f5365c;
 }
 svg.text-danger .color-background {
-  fill: #f56036;
+  fill: #82912f;
 }
 
 svg.text-success .color-foreground {
@@ -22245,7 +22245,7 @@ hr.horizontal.gray-light {
 }
 
 .pagination.pagination-primary .page-item.active > .page-link, .pagination.pagination-primary .page-item.active > .page-link:focus, .pagination.pagination-primary .page-item.active > .page-link:hover {
-  background-image: linear-gradient(310deg, #4B5320 0%, #f56036 100%);
+  background-image: linear-gradient(310deg, #4B5320 0%, #82912f 100%);
   border: none;
 }
 .pagination.pagination-secondary .page-item.active > .page-link, .pagination.pagination-secondary .page-item.active > .page-link:focus, .pagination.pagination-secondary .page-item.active > .page-link:hover {
@@ -22265,7 +22265,7 @@ hr.horizontal.gray-light {
   border: none;
 }
 .pagination.pagination-danger .page-item.active > .page-link, .pagination.pagination-danger .page-item.active > .page-link:focus, .pagination.pagination-danger .page-item.active > .page-link:hover {
-  background-image: linear-gradient(310deg, #f5365c 0%, #f56036 100%);
+  background-image: linear-gradient(310deg, #f5365c 0%, #82912f 100%);
   border: none;
 }
 .pagination.pagination-light .page-item.active > .page-link, .pagination.pagination-light .page-item.active > .page-link:focus, .pagination.pagination-light .page-item.active > .page-link:hover {
@@ -23106,7 +23106,7 @@ p {
   z-index: 1;
 }
 .text-gradient.text-primary {
-  background-image: linear-gradient(310deg, #4B5320, #f56036);
+  background-image: linear-gradient(310deg, #4B5320, #82912f);
 }
 .text-gradient.text-info {
   background-image: linear-gradient(310deg, #1171ef, #11cdef);
@@ -23118,7 +23118,7 @@ p {
   background-image: linear-gradient(310deg, #4B5320, #fbb140);
 }
 .text-gradient.text-danger {
-  background-image: linear-gradient(310deg, #f5365c, #f56036);
+  background-image: linear-gradient(310deg, #f5365c, #82912f);
 }
 .text-gradient.text-dark {
   background-image: linear-gradient(310deg, #212229, #212529);

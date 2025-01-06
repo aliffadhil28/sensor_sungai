@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\DeviceDataController;
@@ -17,3 +18,6 @@ Route::prefix('device-data')->group(function () {
 Route::prefix('device')->group(function () {
     Route::resource('/',DeviceController::class);
 });
+
+Route::get('/stream-data',[HomeController::class,'getStreamData'])->name('get.stream-data');
+Route::put('/stream-data/{id}',[HomeController::class,'updateStreamData'])->name('update.stream-data');

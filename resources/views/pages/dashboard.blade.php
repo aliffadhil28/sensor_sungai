@@ -8,7 +8,7 @@
                 <div class="card-body d-flex justify-content-between">
                     <div class="d-flex flex-column justify-content-between">
                         <h3>Status Banjir</h3>
-                        <h1>Aman</h1>
+                        <h1 id="status_deteksi">Aman</h1>
                     </div>
                     <div class="d-flex flex-column justify-content-between align-items-center">
                         <img src="{{ asset('img/illustrations/flood.png') }}" height="100rem" width="100rem"
@@ -27,7 +27,7 @@
                             <div class="col-8">
                                 <div class="numbers d-flex flex-column">
                                     <p class="text-sm mb-0 text-uppercase font-weight-bold">Ketinggian Air</p>
-                                    <h5 class="font-weight-bolder fs-3 ">
+                                    <h5 id="ketinggian-air" class="font-weight-bolder fs-3 ">
                                         {{ $data->tinggi_air }} cm
                                     </h5>
                                 </div>
@@ -46,7 +46,7 @@
                             <div class="col-8">
                                 <div class="numbers d-flex flex-column">
                                     <p class="text-sm mb-0 text-uppercase font-weight-bold">Debit Air</p>
-                                    <h5 class="font-weight-bolder fs-3 ">
+                                    <h5 id="debit-air" class="font-weight-bolder fs-3 ">
                                         {{ $data->debit_air }} L/s
                                     </h5>
                                 </div>
@@ -65,7 +65,7 @@
                             <div class="col-8">
                                 <div class="numbers d-flex flex-column">
                                     <p class="text-sm mb-0 text-uppercase font-weight-bold">Curah Hujan</p>
-                                    <h5 class="font-weight-bolder fs-3 ">
+                                    <h5 id="curah-hujan" class="font-weight-bolder fs-3 ">
                                         {{ $data->curah_hujan }} mm
                                     </h5>
                                 </div>
@@ -88,7 +88,7 @@
                             <div class="col-8">
                                 <div class="numbers d-flex flex-column">
                                     <p class="text-sm mb-0 text-uppercase font-weight-bold">Battery</p>
-                                    <h5 class="font-weight-bolder fs-3 ">
+                                    <h5 id="battery" class="font-weight-bolder fs-3 ">
                                         {{ $data->battery }} %
                                     </h5>
                                 </div>
@@ -216,5 +216,183 @@
         var chart = new ApexCharts(document.querySelector("#chart"), options);
 
         chart.render();
+    </script>
+    <script>
+        function fetchStreamData() {
+            $.ajax({
+                method: 'GET',
+                url: '{{ route('stream-data') }}',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        const data = response.data;
+
+                        $('#ketinggian-air').text(`${data.tinggi_air} cm`);
+                        $('#debit-air').text(`${data.debit_air} L/s`);
+                        $('#curah-hujan').text(`${data.curah_hujan} mm`);
+                        $('#battery').text(`${data.battery} %`);
+                        const kondisiDeteksi = getKondisi(data.curah_hujan_status, data.tinggi_air_status, data
+                            .debit_air_status);
+
+                        // Atur warna berdasarkan kondisi
+                        let warnaKelas;
+
+                        switch (kondisiDeteksi) {
+                            case 'Aman':
+                                warnaKelas = 'text-success'; // Hijau
+                                break;
+                            case 'Siaga':
+                                warnaKelas = 'text-warning'; // Kuning
+                                break;
+                            case 'Waspada':
+                                warnaKelas = 'text-danger'; // Merah Muda
+                                break;
+                            case 'Bahaya':
+                                warnaKelas = 'text-danger fw-bold'; // Merah Tebal
+                                break;
+                            default:
+                                warnaKelas = 'text-secondary'; // Abu-abu untuk kondisi tidak diketahui
+                        }
+
+                        // Hapus kelas warna lama dan tambahkan kelas baru
+                        $('#status_deteksi').removeClass(
+                            'text-success text-warning text-danger text-secondary fw-bold').addClass(
+                            warnaKelas);
+                        $('#status_deteksi').text(kondisiDeteksi);
+
+                    } else {
+                        console.error('Error:', response.message);
+                    }
+                },
+                error: function(error) {
+                    console.error('AJAX Error:', error.responseJSON.message);
+                }
+            });
+        }
+
+        setInterval(fetchStreamData, 5000);
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchStreamData();
+        });
+    </script>
+    <script>
+        function getKondisi(tingkat_hujan, ketinggian_air, debit_air) {
+            // Aturan kondisi berdasarkan kombinasi parameter
+            const rules = {
+                t: {
+                    r: {
+                        lm: 'Aman',
+                        sd: 'Siaga',
+                        cp: 'Waspada',
+                        sl: 'Bahaya'
+                    },
+                    sd: {
+                        lm: 'Siaga',
+                        sd: 'Waspada',
+                        cp: 'Bahaya',
+                        sl: 'Bahaya'
+                    },
+                    t: {
+                        lm: 'Waspada',
+                        sd: 'Bahaya',
+                        cp: 'Bahaya',
+                        sl: 'Bahaya'
+                    },
+                    st: {
+                        lm: 'Bahaya',
+                        sd: 'Bahaya',
+                        cp: 'Bahaya',
+                        sl: 'Bahaya'
+                    }
+                },
+                r: {
+                    r: {
+                        lm: 'Aman',
+                        sd: 'Siaga',
+                        cp: 'Siaga',
+                        sl: 'Waspada'
+                    },
+                    sd: {
+                        lm: 'Siaga',
+                        sd: 'Waspada',
+                        cp: 'Waspada',
+                        sl: 'Bahaya'
+                    },
+                    t: {
+                        lm: 'Waspada',
+                        sd: 'Bahaya',
+                        cp: 'Bahaya',
+                        sl: 'Bahaya'
+                    },
+                    st: {
+                        lm: 'Bahaya',
+                        sd: 'Bahaya',
+                        cp: 'Bahaya',
+                        sl: 'Bahaya'
+                    }
+                },
+                sd: {
+                    r: {
+                        lm: 'Siaga',
+                        sd: 'Waspada',
+                        cp: 'Waspada',
+                        sl: 'Bahaya'
+                    },
+                    sd: {
+                        lm: 'Waspada',
+                        sd: 'Waspada',
+                        cp: 'Bahaya',
+                        sl: 'Bahaya'
+                    },
+                    t: {
+                        lm: 'Bahaya',
+                        sd: 'Bahaya',
+                        cp: 'Bahaya',
+                        sl: 'Bahaya'
+                    },
+                    st: {
+                        lm: 'Bahaya',
+                        sd: 'Bahaya',
+                        cp: 'Bahaya',
+                        sl: 'Bahaya'
+                    }
+                },
+                l: {
+                    r: {
+                        lm: 'Siaga',
+                        sd: 'Waspada',
+                        cp: 'Bahaya',
+                        sl: 'Bahaya'
+                    },
+                    sd: {
+                        lm: 'Waspada',
+                        sd: 'Bahaya',
+                        cp: 'Bahaya',
+                        sl: 'Bahaya'
+                    },
+                    t: {
+                        lm: 'Bahaya',
+                        sd: 'Bahaya',
+                        cp: 'Bahaya',
+                        sl: 'Bahaya'
+                    },
+                    st: {
+                        lm: 'Bahaya',
+                        sd: 'Bahaya',
+                        cp: 'Bahaya',
+                        sl: 'Bahaya'
+                    }
+                }
+            };
+
+            // Konversi input ke huruf kecil untuk mencocokkan kunci
+            tingkat_hujan = tingkat_hujan.toLowerCase();
+            ketinggian_air = ketinggian_air.toLowerCase();
+            debit_air = debit_air.toLowerCase();
+
+            // Periksa dan kembalikan kondisi
+            return rules[tingkat_hujan]?.[ketinggian_air]?.[debit_air] || 'data tidak valid';
+        }
     </script>
 @endpush
