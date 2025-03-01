@@ -30,6 +30,7 @@
                                     <h5 id="ketinggian-air" class="font-weight-bolder fs-3 ">
                                         {{ $data->tinggi_air }} cm
                                     </h5>
+                                    <small id="monitor_tinggi"></small>
                                 </div>
                             </div>
                             <div class="col-4 text-end">
@@ -49,6 +50,7 @@
                                     <h5 id="debit-air" class="font-weight-bolder fs-3 ">
                                         {{ $data->debit_air }} L/s
                                     </h5>
+                                    <small id="monitor_debit"></small>
                                 </div>
                             </div>
                             <div class="col-4 text-end">
@@ -68,6 +70,7 @@
                                     <h5 id="curah-hujan" class="font-weight-bolder fs-3 ">
                                         {{ $data->curah_hujan }} mm
                                     </h5>
+                                    <small id="monitor_hujan"></small>
                                 </div>
                             </div>
                             <div class="col-4 text-end">
@@ -91,6 +94,7 @@
                                     <h5 id="battery" class="font-weight-bolder fs-3 ">
                                         {{ $data->battery }} %
                                     </h5>
+                                    <small id="monitor_battery"></small>
                                 </div>
                             </div>
                             <div class="col-4 text-end">
@@ -218,6 +222,22 @@
         chart.render();
     </script>
     <script>
+        function saveHistoryData(status) {
+            $.ajax({
+                method: 'POST',
+                url: '{{ route('data_history.save') }}',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: {
+                    'status': status
+                },
+                error: function(error) {
+                    console.error('AJAX Error:', error.responseJSON.message);
+                }
+            })
+        }
+
         function fetchStreamData() {
             $.ajax({
                 method: 'GET',
@@ -230,6 +250,20 @@
                         $('#debit-air').text(`${data.debit_air} L/s`);
                         $('#curah-hujan').text(`${data.curah_hujan} mm`);
                         $('#battery').text(`${data.battery} %`);
+                        $('#suara').text(`${data.suara != null ? data.suara : '0' } db`);
+                        $('#sinyal').text(`${data.sinyal != null ? data.sinyal : '0'} MB/s`);
+                        const batteryMon = getStatus(data.battery, 'battery');
+                        const tinggiMon = getStatus(data.tinggi_air, 'tinggi_air');
+                        const debitMon = getStatus(data.debit_air, 'debit_air');
+                        const hujanMon = getStatus(data.curah_hujan, 'curah_hujan');
+                        $('#monitor_battery').text(`${batteryMon.text} (${batteryMon.status})`).addClass(
+                            `text-${batteryMon.color}`)
+                        $('#monitor_tinggi').text(`${tinggiMon.text} (${tinggiMon.status})`).addClass(
+                            `text-${tinggiMon.color}`)
+                        $('#monitor_debit').text(`${debitMon.text} (${debitMon.status})`).addClass(
+                            `text-${debitMon.color}`)
+                        $('#monitor_hujan').text(`${hujanMon.text} (${hujanMon.status ?? '-'})`).addClass(
+                            `text-${hujanMon.color}`)
                         const kondisiDeteksi = getKondisi(data.curah_hujan_status, data.tinggi_air_status, data
                             .debit_air_status);
 
@@ -244,9 +278,11 @@
                                 warnaKelas = 'text-warning'; // Kuning
                                 break;
                             case 'Waspada':
+                                saveHistoryData(kondisiDeteksi)
                                 warnaKelas = 'text-danger'; // Merah Muda
                                 break;
                             case 'Bahaya':
+                                saveHistoryData(kondisiDeteksi)
                                 warnaKelas = 'text-danger fw-bold'; // Merah Tebal
                                 break;
                             default:
@@ -277,6 +313,126 @@
         });
     </script>
     <script>
+        function getStatus(data, sensor) {
+            let color = '';
+            let text = '';
+            switch (sensor) {
+                case 'battery':
+                    if (data >= 75 && data <= 100) {
+                        return {
+                            color: 'success',
+                            text: 'Aman',
+                            status: '> 75%'
+                        }
+                    } else if (data >= 50 && data <= 75) {
+                        return {
+                            color: 'warning fw-bold',
+                            text: 'Siaga',
+                            status: '> 50%'
+                        }
+                    } else if (data >= 25 && data <= 50) {
+                        return {
+                            color: 'danger',
+                            text: 'Waspada',
+                            status: '> 25%'
+                        }
+                    } else {
+                        return {
+                            color: 'danger fw-bold',
+                            text: 'Bahaya',
+                            status: '< 25%'
+                        }
+                    }
+                    break;
+                case 'tinggi_air':
+                    if (data >= 0 && data <= 100) {
+                        return {
+                            color: 'danger fw-bold',
+                            text: 'Bahaya',
+                            status: '< 100'
+                        }
+                    } else if (data >= 100 && data <= 120) {
+                        return {
+                            color: 'danger',
+                            text: 'Siaga',
+                            status: '> 100'
+                        }
+                    } else if (data >= 120 && data <= 130) {
+                        return {
+                            color: 'warning fw-bold',
+                            text: 'Waspada',
+                            status: '> 120'
+                        }
+                    } else {
+                        return {
+                            color: 'success',
+                            text: 'Aman',
+                            status: '> 130'
+                        }
+                    }
+                    break;
+                case 'debit_air':
+                    if (data >= 0 && data <= 10) {
+                        return {
+                            color: 'success',
+                            text: 'Lambat',
+                            status: '< 10'
+                        }
+                    } else if (data >= 10 && data <= 20) {
+                        return {
+                            color: 'warning fw-bold',
+                            text: 'Siaga',
+                            status: '< 20'
+                        }
+                    } else if (data >= 20 && data <= 30) {
+                        return {
+                            color: 'danger',
+                            text: 'Waspada',
+                            status: '< 30'
+                        }
+                    } else {
+                        return {
+                            color: 'danger fw-bold',
+                            text: 'Bahaya',
+                            status: '> 30'
+                        }
+                    }
+                    break;
+                case 'hujan':
+                    if (data >= 2800 && data <= 4056) {
+                        return {
+                            color: 'success',
+                            text: 'Aman',
+                            status: '< 4056'
+                        }
+                    } else if (data >= 1800 && data <= 2800) {
+                        return {
+                            color: 'warning fw-bold',
+                            text: 'Siaga',
+                            status: '< 2800'
+                        }
+                    } else if (data >= 800 && data <= 1800) {
+                        return {
+                            color: 'danger',
+                            text: 'Waspada',
+                            status: '< 1800'
+                        }
+                    } else {
+                        return {
+                            color: 'danger fw-bold',
+                            text: 'Bahaya',
+                            status: '< 800'
+                        }
+                    }
+                    break;
+                default:
+                    return {
+                        color: 'secondary', text: 'Not Found'
+                    }
+                    break;
+            }
+        }
+
         function getKondisi(tingkat_hujan, ketinggian_air, debit_air) {
             // Aturan kondisi berdasarkan kombinasi parameter
             const rules = {

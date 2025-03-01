@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{DeviceData,DeviceDataStream};
+use App\Models\{DataHistory,DeviceDataStream};
+use Carbon\Carbon;
 
 class HomeController extends Controller
 {
@@ -71,5 +72,48 @@ class HomeController extends Controller
                 'message' => $th->getMessage()
             ],500);
         }
+    }
+
+    public function saveHistoryData(Request $request)
+    {
+        try {
+            // Validasi input
+            $request->validate([
+                'status' => 'required|string'
+            ]);
+
+            $now = now();
+
+            // Ambil data terakhir dengan status yang sama
+            $data = DataHistory::where('status', $request->status)->latest()->first();
+
+            if ($data) {
+                $endTime = Carbon::parse($data->end_time);
+
+                // Periksa apakah end_time kurang dari 15 detik dari waktu sekarang
+                if ($endTime->diffInSeconds($now) < 15) {
+                    $data->update(['end_time' => $now]);
+                    return response()->json(['message' => 'Data diperbarui'], 200);
+                }
+            }
+
+            // Jika tidak memenuhi kondisi, buat data baru
+            DataHistory::create([
+                'status' => $request->status,
+                'start_time' => $now,
+                'end_time' => $now,
+            ]);
+
+            return response()->json(['message' => 'Data baru berhasil disimpan'], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Gagal: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getHistoryData(){
+        $data = DataHistory::orderBy('end_time', 'desc')->limit(10)->get();
+        return response()->json($data);
     }
 }

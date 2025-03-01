@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-icon.png">
     <link rel="icon" type="image/png" href="/img/favicon.png">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>
         Smart Floods
     </title>
@@ -69,6 +70,55 @@
                 damping: '0.5'
             }
             Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+        }
+    </script>
+    <script>
+        $(document).ready(function() {
+            // Panggil fungsi pertama kali saat halaman dimuat
+            getHistoryData();
+        });
+
+        function getHistoryData(status) {
+            $.ajax({
+                method: 'GET',
+                url: '{{ route('data_history.get') }}',
+                success: function(response) {
+                    $('#notificationContainer').html(''); // Kosongkan kontainer sebelum menambahkan data
+                    var html = '';
+
+                    response.forEach(val => {
+                        html += `
+                <li class="mb-2">
+                    <a class="dropdown-item border-radius-md" href="javascript:;">
+                        <div class="d-flex py-1">
+                            <div class="d-flex flex-column justify-content-center">
+                                <h6 class="text-sm font-weight-normal mb-1">
+                                    <span class="font-weight-bold">Telah terdeteksi status ${val.status}</span>
+                                </h6>
+                                <p class="text-xs text-secondary mb-0">
+                                    <i class="fa fa-clock me-1"></i>
+                                    ${formatTime(val.start_time)} - ${formatTime(val.end_time)}
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            `;
+                    });
+
+                    $('#notificationContainer').html(html); // Masukkan HTML ke dalam container
+                },
+                error: function(xhr, status, error) {
+                    console.error("Terjadi kesalahan:", error);
+                }
+            });
+
+            // Fungsi untuk memformat waktu menjadi lebih mudah dibaca
+            function formatTime(timestamp) {
+                const date = new Date(timestamp);
+                return date.toLocaleString(); // Ubah format sesuai kebutuhan
+            }
+
         }
     </script>
     <!-- Github buttons -->
