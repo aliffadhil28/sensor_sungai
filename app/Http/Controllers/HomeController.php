@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\{DataHistory,DeviceDataStream};
 use Carbon\Carbon;
+use Telegram\Bot\Api;
 
 class HomeController extends Controller
 {
@@ -115,5 +116,22 @@ class HomeController extends Controller
     public function getHistoryData(){
         $data = DataHistory::orderBy('end_time', 'desc')->limit(10)->get();
         return response()->json($data);
+    }
+
+    public function sendMessageBot(Request $request){
+        $data = DataHistory::orderBy('end_time', 'desc')->latest()->first();
+        // $message = "";
+        $telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
+        $chatId = '7694944233';
+        $message = $request->input('pesan');
+
+        $reponse = $telegram->sendMessage([
+            'chat_id' => $chatId,
+            'text' => $message,
+        ]);
+
+        return response()->json([
+            'message' => "Pesan $request->pesan berhasil dikirim ke bot"
+        ],200);
     }
 }
