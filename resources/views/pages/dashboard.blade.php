@@ -246,30 +246,40 @@
                     if (response.status === 'success') {
                         const data = response.data;
 
+                        // Perbarui tampilan nilai sensor
                         $('#ketinggian-air').text(`${data.tinggi_air} cm`);
                         $('#debit-air').text(`${data.debit_air} L/s`);
                         $('#curah-hujan').text(`${data.curah_hujan} mm`);
                         $('#battery').text(`${data.battery} %`);
-                        $('#suara').text(`${data.suara != null ? data.suara : '0' } db`);
+                        $('#suara').text(`${data.suara != null ? data.suara : '0'} db`);
                         $('#sinyal').text(`${data.sinyal != null ? data.sinyal : '0'} MB/s`);
+
+                        // Dapatkan status untuk setiap sensor
                         const batteryMon = getStatus(data.battery, 'battery');
                         const tinggiMon = getStatus(data.tinggi_air, 'tinggi_air');
                         const debitMon = getStatus(data.debit_air, 'debit_air');
                         const hujanMon = getStatus(data.curah_hujan, 'curah_hujan');
+
+                        // Reset semua kelas warna terlebih dahulu untuk menghindari penumpukan kelas
+                        $('#monitor_battery, #monitor_tinggi, #monitor_debit, #monitor_hujan').removeClass(
+                            'text-success text-warning text-danger text-secondary fw-bold');
+                        console.log(tinggiMon);
+
+                        // Perbarui tampilan status untuk setiap monitor
                         $('#monitor_battery').text(`${batteryMon.text} (${batteryMon.status})`).addClass(
-                            `text-${batteryMon.color}`)
+                            `text-${batteryMon.color}`);
                         $('#monitor_tinggi').text(`${tinggiMon.text} (${tinggiMon.status})`).addClass(
-                            `text-${tinggiMon.color}`)
+                            `text-${tinggiMon.color}`);
                         $('#monitor_debit').text(`${debitMon.text} (${debitMon.status})`).addClass(
-                            `text-${debitMon.color}`)
+                            `text-${debitMon.color}`);
                         $('#monitor_hujan').text(`${hujanMon.text} (${hujanMon.status ?? '-'})`).addClass(
-                            `text-${hujanMon.color}`)
-                        const kondisiDeteksi = getKondisi(data.curah_hujan_status, data.tinggi_air_status, data
-                            .debit_air_status);
+                            `text-${hujanMon.color}`);
+
+                        // Dapatkan kondisi keseluruhan berdasarkan nilai sensor langsung
+                        const kondisiDeteksi = getKondisi(data.curah_hujan, data.tinggi_air, data.debit_air);
 
                         // Atur warna berdasarkan kondisi
                         let warnaKelas;
-
                         switch (kondisiDeteksi) {
                             case 'Aman':
                                 warnaKelas = 'text-success'; // Hijau
@@ -278,11 +288,11 @@
                                 warnaKelas = 'text-warning'; // Kuning
                                 break;
                             case 'Waspada':
-                                saveHistoryData(kondisiDeteksi)
-                                warnaKelas = 'text-danger'; // Merah Muda
+                                saveHistoryData(kondisiDeteksi);
+                                warnaKelas = 'text-danger'; // Merah
                                 break;
                             case 'Bahaya':
-                                saveHistoryData(kondisiDeteksi)
+                                saveHistoryData(kondisiDeteksi);
                                 warnaKelas = 'text-danger fw-bold'; // Merah Tebal
                                 break;
                             default:
@@ -291,10 +301,9 @@
 
                         // Hapus kelas warna lama dan tambahkan kelas baru
                         $('#status_deteksi').removeClass(
-                            'text-success text-warning text-danger text-secondary fw-bold').addClass(
-                            warnaKelas);
-                        $('#status_deteksi').text(kondisiDeteksi);
-
+                                'text-success text-warning text-danger text-secondary fw-bold')
+                            .addClass(warnaKelas)
+                            .text(kondisiDeteksi);
                     } else {
                         console.error('Error:', response.message);
                     }
@@ -306,13 +315,7 @@
         }
 
         setInterval(fetchStreamData, 5000);
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            fetchStreamData();
-        });
-    </script>
-    <script>
+
         function getStatus(data, sensor) {
             let color = '';
             let text = '';
@@ -398,7 +401,7 @@
                         }
                     }
                     break;
-                case 'hujan':
+                case 'curah_hujan':
                     if (data >= 2800 && data <= 4056) {
                         return {
                             color: 'success',
@@ -427,13 +430,55 @@
                     break;
                 default:
                     return {
-                        color: 'secondary', text: 'Not Found'
+                        color: 'secondary', text: 'Not Found', class: 'text-secondary'
                     }
                     break;
             }
         }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchStreamData();
+        });
+    </script>
+    <script>
+        function getKondisi(curah_hujan, tinggi_air, debit_air) {
+            // Kategorisasi curah hujan
+            let kategori_hujan;
+            if (curah_hujan >= 2800) {
+                kategori_hujan = 't'; // Tidak hujan / Aman
+            } else if (curah_hujan >= 1800 && curah_hujan < 2800) {
+                kategori_hujan = 'r'; // Ringan
+            } else if (curah_hujan >= 800 && curah_hujan < 1800) {
+                kategori_hujan = 'sd'; // Sedang
+            } else {
+                kategori_hujan = 'l'; // Lebat / Bahaya
+            }
 
-        function getKondisi(tingkat_hujan, ketinggian_air, debit_air) {
+            // Kategorisasi ketinggian air
+            let kategori_air;
+            if (tinggi_air >= 130) {
+                kategori_air = 'r'; // Rendah / Aman
+            } else if (tinggi_air >= 120 && tinggi_air < 130) {
+                kategori_air = 'sd'; // Sedang
+            } else if (tinggi_air >= 100 && tinggi_air < 120) {
+                kategori_air = 't'; // Tinggi
+            } else {
+                kategori_air = 'st'; // Sangat tinggi / Bahaya
+            }
+
+            // Kategorisasi debit air
+            let kategori_debit;
+            if (debit_air >= 0 && debit_air <= 10) {
+                kategori_debit = 'lm'; // Lambat / Aman
+            } else if (debit_air > 10 && debit_air <= 20) {
+                kategori_debit = 'sd'; // Sedang
+            } else if (debit_air > 20 && debit_air <= 30) {
+                kategori_debit = 'cp'; // Cepat
+            } else {
+                kategori_debit = 'sl'; // Sangat Lambat / Bahaya
+            }
+
             // Aturan kondisi berdasarkan kombinasi parameter
             const rules = {
                 t: {
@@ -542,13 +587,124 @@
                 }
             };
 
-            // Konversi input ke huruf kecil untuk mencocokkan kunci
-            tingkat_hujan = tingkat_hujan.toLowerCase();
-            ketinggian_air = ketinggian_air.toLowerCase();
-            debit_air = debit_air.toLowerCase();
-
             // Periksa dan kembalikan kondisi
-            return rules[tingkat_hujan]?.[ketinggian_air]?.[debit_air] || 'data tidak valid';
+            return rules[kategori_hujan]?.[kategori_air]?.[kategori_debit] || 'data tidak valid';
+        }
+        // Aturan kondisi berdasarkan kombinasi parameter
+        const rules = {
+            t: {
+                r: {
+                    lm: 'Aman',
+                    sd: 'Siaga',
+                    cp: 'Waspada',
+                    sl: 'Bahaya'
+                },
+                sd: {
+                    lm: 'Siaga',
+                    sd: 'Waspada',
+                    cp: 'Bahaya',
+                    sl: 'Bahaya'
+                },
+                t: {
+                    lm: 'Waspada',
+                    sd: 'Bahaya',
+                    cp: 'Bahaya',
+                    sl: 'Bahaya'
+                },
+                st: {
+                    lm: 'Bahaya',
+                    sd: 'Bahaya',
+                    cp: 'Bahaya',
+                    sl: 'Bahaya'
+                }
+            },
+            r: {
+                r: {
+                    lm: 'Aman',
+                    sd: 'Siaga',
+                    cp: 'Siaga',
+                    sl: 'Waspada'
+                },
+                sd: {
+                    lm: 'Siaga',
+                    sd: 'Waspada',
+                    cp: 'Waspada',
+                    sl: 'Bahaya'
+                },
+                t: {
+                    lm: 'Waspada',
+                    sd: 'Bahaya',
+                    cp: 'Bahaya',
+                    sl: 'Bahaya'
+                },
+                st: {
+                    lm: 'Bahaya',
+                    sd: 'Bahaya',
+                    cp: 'Bahaya',
+                    sl: 'Bahaya'
+                }
+            },
+            sd: {
+                r: {
+                    lm: 'Siaga',
+                    sd: 'Waspada',
+                    cp: 'Waspada',
+                    sl: 'Bahaya'
+                },
+                sd: {
+                    lm: 'Waspada',
+                    sd: 'Waspada',
+                    cp: 'Bahaya',
+                    sl: 'Bahaya'
+                },
+                t: {
+                    lm: 'Bahaya',
+                    sd: 'Bahaya',
+                    cp: 'Bahaya',
+                    sl: 'Bahaya'
+                },
+                st: {
+                    lm: 'Bahaya',
+                    sd: 'Bahaya',
+                    cp: 'Bahaya',
+                    sl: 'Bahaya'
+                }
+            },
+            l: {
+                r: {
+                    lm: 'Siaga',
+                    sd: 'Waspada',
+                    cp: 'Bahaya',
+                    sl: 'Bahaya'
+                },
+                sd: {
+                    lm: 'Waspada',
+                    sd: 'Bahaya',
+                    cp: 'Bahaya',
+                    sl: 'Bahaya'
+                },
+                t: {
+                    lm: 'Bahaya',
+                    sd: 'Bahaya',
+                    cp: 'Bahaya',
+                    sl: 'Bahaya'
+                },
+                st: {
+                    lm: 'Bahaya',
+                    sd: 'Bahaya',
+                    cp: 'Bahaya',
+                    sl: 'Bahaya'
+                }
+            }
+        };
+
+        // Konversi input ke huruf kecil untuk mencocokkan kunci
+        tingkat_hujan = tingkat_hujan.toLowerCase();
+        ketinggian_air = ketinggian_air.toLowerCase();
+        debit_air = debit_air.toLowerCase();
+
+        // Periksa dan kembalikan kondisi
+        return rules[tingkat_hujan]?.[ketinggian_air]?.[debit_air] || 'data tidak valid';
         }
     </script>
 @endpush
