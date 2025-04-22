@@ -14,7 +14,7 @@ class TelegramController extends Controller
     {
         // Telegram::addCommand(SubscribeChannel::class);
         $telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
-        $url = 'https://6072-2a09-bac5-3a21-25cd-00-3c4-54.ngrok-free.app/api/telegram/webhook'; // Sesuaikan dengan domain kamu
+        $url = 'https://84cf-180-254-65-227.ngrok-free.app/api/telegram/webhook'; // Sesuaikan dengan domain kamu
 
         $response = $telegram->setWebhook(['url' => $url]);
 

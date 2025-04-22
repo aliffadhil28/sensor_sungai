@@ -56,9 +56,9 @@ class CreateNotification extends Command
             // Dalam method handle()
             // Setelah mendapatkan detection status
             $detectionStatus = $this->getDetectionStatus(
-                $data->curah_hujan_status,
-                $data->tinggi_air_status,
-                $data->debit_air_status
+                $data->curah_hujan,
+                $data->tinggi_air,
+                $data->debit_air
             );
 
             // Cek apakah status adalah Waspada atau Bahaya
@@ -252,8 +252,44 @@ class CreateNotification extends Command
     /**
      * Get overall detection status based on sensor statuses
      */
-    private function getDetectionStatus($rainfallStatus, $waterLevelStatus, $waterFlowStatus)
+    private function getDetectionStatus($curah_hujan, $tinggi_air, $debit_air)
     {
+        // Kategorisasi curah hujan
+        $kategori_hujan = '';
+        if ($curah_hujan >= 2800) {
+            $kategori_hujan = 't'; // Tidak hujan / Aman
+        } elseif ($curah_hujan >= 1800 && $curah_hujan < 2800) {
+            $kategori_hujan = 'r'; // Ringan
+        } elseif ($curah_hujan >= 800 && $curah_hujan < 1800) {
+            $kategori_hujan = 'sd'; // Sedang
+        } else {
+            $kategori_hujan = 'l'; // Lebat / Bahaya
+        }
+
+        // Kategorisasi ketinggian air
+        $kategori_air = '';
+        if ($tinggi_air >= 130) {
+            $kategori_air = 'r'; // Rendah / Aman
+        } elseif ($tinggi_air >= 120 && $tinggi_air < 130) {
+            $kategori_air = 'sd'; // Sedang
+        } elseif ($tinggi_air >= 100 && $tinggi_air < 120) {
+            $kategori_air = 't'; // Tinggi
+        } else {
+            $kategori_air = 'st'; // Sangat tinggi / Bahaya
+        }
+
+        // Kategorisasi debit air
+        $kategori_debit = '';
+        if ($debit_air >= 0 && $debit_air <= 10) {
+            $kategori_debit = 'lm'; // Lambat / Aman
+        } elseif ($debit_air > 10 && $debit_air <= 20) {
+            $kategori_debit = 'sd'; // Sedang
+        } elseif ($debit_air > 20 && $debit_air <= 30) {
+            $kategori_debit = 'cp'; // Cepat
+        } else {
+            $kategori_debit = 'sl'; // Sangat Lambat / Bahaya
+        }
+
         // Define detection rules based on the JavaScript logic
         $rules = [
             't' => [
@@ -362,14 +398,9 @@ class CreateNotification extends Command
             ]
         ];
 
-        // Convert input to lowercase for matching
-        $rainfallStatus = strtolower($rainfallStatus);
-        $waterLevelStatus = strtolower($waterLevelStatus);
-        $waterFlowStatus = strtolower($waterFlowStatus);
-
         // Check if all keys exist and return the status
-        if (isset($rules[$rainfallStatus][$waterLevelStatus][$waterFlowStatus])) {
-            return $rules[$rainfallStatus][$waterLevelStatus][$waterFlowStatus];
+        if (isset($rules[$kategori_hujan][$kategori_air][$kategori_debit])) {
+            return $rules[$kategori_hujan][$kategori_air][$kategori_debit];
         }
         
         return 'data tidak valid';
